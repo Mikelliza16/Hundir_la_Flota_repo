@@ -1,38 +1,87 @@
-import numpy as np
+from utils import tablero, crear_barco, colocar_barco, mostrar_tablero
 
-from utils import tablero
-import random
 
-def tablero():
-    tablero = np.full((10,10), " ")
-    return tablero
-
+#Crear - imprimir tablero
 tablero_jugador = tablero()
 tablero_rival = tablero()
-print("Tablero_jugador")
+
+
+#Crear - imprimir barcos
+barcos_jugador = [crear_barco(2, tamaño=10),
+                  crear_barco(2, tamaño=10),
+                  crear_barco(2, tamaño=10),
+                  crear_barco(3, tamaño=10),
+                  crear_barco(3, tamaño=10),
+                  crear_barco(4, tamaño=10),]
+
+for b in barcos_jugador:
+    colocar_barco(b, tablero_jugador)
+
+# === CREAR BARCOS RIVAL ===
+barcos_rival = [crear_barco(2, tamaño=10),
+                crear_barco(2, tamaño=10),
+                crear_barco(2, tamaño=10),
+                crear_barco(3, tamaño=10),
+                crear_barco(3, tamaño=10),
+                crear_barco(4, tamaño=10),]
+
+for b in barcos_rival:
+    colocar_barco(b, tablero_rival)
+
+#Imprimir - tableros con barcos:
+print("Tablero del Jugador:")
 print(tablero_jugador)
-print("___________________________________________")
-print("Tablero_rival")
+print("________________________________________")
+print("Tablero del Rival:")
 print(tablero_rival)
+print("________________________________________")
 
 
-#FUNCIÓN PARA CREAR BARCOS
+# Inicio del juego:
 
-import random
+turno = 1  # 1 = jugador, 2 = rival
 
-def crear_barco(eslora, tamaño=10): 
-    fila = random.randint(0, tamaño - 1)
-    columna = random.randint(0, tamaño - 1)
-    direccion = random.choice(["horizontal", "svertical"])
-    barco = []
+print("\n¡Comienza a jugar! ¡Jugador te toca a tí!")
 
-    for i in range(eslora):
-        if direccion == "horizontal" and columna + eslora <= tamaño:
-            barco.append((fila, columna + i))
-        elif direccion == "vertical" and fila + eslora <= tamaño:
-            barco.append((fila + i, columna))
+while True:
+    print(f"\nTurno del jugador {turno}")
+# Disparar
+    fila = int(input("Fila (0-9): "))
+    columna = int(input("Columna (0-9): "))
+
+    if turno == 1:  # Turno del jugador
+        
+        if tablero_rival[fila][columna] == "O":
+            print("¡Tocado!")
+            tablero_rival[fila][columna] = "X"
         else:
-            # Si el barco se sale del tablero, se repite
-            return crear_barco(eslora, tamaño)
-    return barco
+            print("¡Agua!")
+            tablero_rival[fila][columna] = "A"
 
+        # Comprobar si el jugador ha ganado
+        barcos_restantes = any("O" in f for f in tablero_rival)
+        if not barcos_restantes:
+            print("\n¡El jugador ha ganado la partida!")
+            break
+
+        turno = 2  # Pasa al rival
+
+    else:  # Turno del rival
+       
+        if tablero_jugador[fila][columna] == "O":
+            print("¡Tocado!")
+            tablero_jugador[fila][columna] = "X"
+        else:
+            print("¡Agua!")
+            tablero_jugador[fila][columna] = "A"
+
+        # Comprobar si el rival ha ganado
+        barcos_restantes = any("O" in f for f in tablero_jugador)
+        if not barcos_restantes:
+            print("\n¡El rival ha ganado la partida!")
+            break
+
+        turno = 1  # Vuelve al jugador
+
+    mostrar_tablero(tablero_jugador, "Jugador")
+    mostrar_tablero(tablero_rival, "Rival")
